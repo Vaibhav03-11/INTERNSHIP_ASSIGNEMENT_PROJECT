@@ -127,7 +127,7 @@ See **ASSIGNMENT.md** for detailed instructions.
 3. **Use setSearchParams**: Properly update the URL search parameters using React Router's `setSearchParams`
 
 **Changes:**
-- Added `useNavigate` import from React Router
+- Added `useSearchParams` import from React Router
 - Initialize state from URL params: `searchParams.get('page')`, `searchParams.get('status')`, `searchParams.get('search')`
 - Added useEffect to sync state changes back to URL
 - Removed confusing manual URL parsing logic
@@ -242,3 +242,55 @@ Uses React Query's mutation callbacks to implement optimistic UI:
 - Seamless UI update with no loading spinner or table flicker
 - Safe rollback on error preserves data integrity
 - Professional, responsive user experience
+
+---
+
+### UI/UX Enhancements
+
+#### Styling & Theme Improvements
+**Location:** `src/App.tsx`, `src/components/tables/DynamicGrid.tsx`, `src/pages/UsersPage/UsersPage.tsx`
+
+**Implementation:**
+
+**Enhanced MUI Theme:**
+- Refined primary (#1565c0) and secondary (#7b1fa2) palette colors
+- Improved typography with Inter/Roboto font stack
+- Rounded corners (10px base shape, 8px buttons, 12px papers, 6px chips)
+- Consistent spacing and component defaults
+
+**Component Overrides:**
+- Buttons: removed text-transform, added 8px border-radius
+- Papers: added rounded 12px radius, default elevation
+- Chips: set small size default, 6px border-radius
+- Table cells: styled header with subtle background (#f0f3f7) and border
+- Icon buttons: set small size default
+
+**Table Polish:**
+- Sticky headers for better scrolling experience
+- Zebra striping with subtle alternating row colors (rgba(0,0,0,0.02))
+- Improved hover states with clearer action.hover background
+- Enhanced chip styling:
+  - Active status: success-filled with checkmark
+  - Inactive status: warning-outlined for visibility
+  - Group chips: primary color with consistent rounding
+- Better visual hierarchy with styled table headers
+
+**Empty & Error States:**
+- Friendly "No users found" message when dataset is empty
+- Helpful prompts to adjust filters or search query
+- Proper error alerts when API fails to load users
+
+**Changes:**
+- Updated theme palette, typography, and component overrides in `App.tsx`
+- Added sticky header (`enableStickyHeader: true`) to `DynamicGrid`
+- Added zebra striping with `&:nth-of-type(odd)` styling on table rows
+- Enhanced chip rendering with better colors (success/warning/primary) and variants
+- Added empty state conditional render in `UsersPage` when `usersWithActions.length === 0`
+- Improved error handling in error state block
+
+**Impact:**
+- More polished, professional appearance aligned with modern design standards
+- Better user experience with clearer visual hierarchy and feedback
+- Improved accessibility with sticky headers and better contrast
+- More intuitive empty/error states help users understand application state
+- Consistent, cohesive design language across all components
