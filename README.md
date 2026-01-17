@@ -203,3 +203,42 @@ See **ASSIGNMENT.md** for detailed instructions.
 - Users can see the table structure while data loads
 - More professional and polished loading experience
 - Matches Material Design loading patterns
+
+---
+
+#### Feature #3: Optimistic UI for Status Toggle
+**Location:** `src/hooks/useUsers.ts`, `src/pages/UsersPage/UsersPage.tsx`
+
+**Previous State:** When toggling user status (active/inactive), UI waited for the API response before updating the button and table. This created a lag between user action and visual feedback.
+
+**Implementation:**
+Uses React Query's mutation callbacks to implement optimistic UI:
+- **onMutate**: Immediately update the cached user list with new status before API call
+- **onError**: Rollback to the previous cached state if the API fails
+- **onSuccess**: Merge the server-confirmed response into cache (no refetch needed)
+
+**How It Works:**
+1. User clicks activate/deactivate button → `onMutate` runs immediately
+2. Cached list updates with the new status → UI updates instantly
+3. API call happens in the background (no wait)
+4. If API succeeds: `onSuccess` merges server data into cache (already correct)
+5. If API fails: `onError` reverts cache to previous state + error snackbar shows
+
+**Key Optimizations:**
+- Passes current list params (`page`, `pageSize`, `status`, `search`) to the hook so it targets the exact cached list for the visible page
+- `onSuccess` merges server response instead of invalidating queries, preventing the table from "loading" again
+- Fallback invalidation only if params are unknown
+
+**Changes:**
+- Updated `useUpdateUserStatus` to accept optional `currentParams: PaginationParams`
+- Implemented `onMutate`: cancel in-flight queries and take cache snapshot
+- Implemented `onError`: restore snapshot if mutation fails
+- Implemented `onSuccess`: merge updated user into cached list
+- Modified `UsersPage.tsx` to pass current pagination/filter state to the hook
+- Added `User` type import to hook for type-safe response handling
+
+**Impact:**
+- Status toggle feels instant with zero perceived delay
+- Seamless UI update with no loading spinner or table flicker
+- Safe rollback on error preserves data integrity
+- Professional, responsive user experience

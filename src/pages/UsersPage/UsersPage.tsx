@@ -78,8 +78,13 @@ export const UsersPage: React.FC = () => {
     status: statusFilter,
   });
 
-  // Update user status mutation
-  const { mutate: updateStatus, isPending: isUpdating } = useUpdateUserStatus();
+  // Update user status mutation with optimistic UI for the current page dataset
+  const { mutate: updateStatus, isPending: isUpdating } = useUpdateUserStatus({
+    page: pagination.pageIndex + 1,
+    pageSize: pagination.pageSize,
+    query: debouncedSearchQuery,
+    status: statusFilter,
+  });
 
   // Handle status toggle
   const handleToggleStatus = (userId: string, newStatus: 'active' | 'inactive') => {
@@ -87,8 +92,8 @@ export const UsersPage: React.FC = () => {
       { userId, status: newStatus },
       {
         onSuccess: (response) => {
+          // UI already updated optimistically; show success message
           enqueueSnackbar(response.message, { variant: 'success' });
-          // BUG: Table doesn't refresh after this!
         },
         onError: () => {
           enqueueSnackbar('Failed to update user status', { variant: 'error' });
