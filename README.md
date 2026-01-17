@@ -108,3 +108,33 @@ See **ASSIGNMENT.md** for detailed instructions.
 - Groups now display as readable, properly formatted chips with their actual names
 
 **Impact:** Users can now see which groups each user belongs to, improving data visibility and usability.
+
+---
+
+#### Bug #3: Pagination Not Synced with URL ✅
+**Location:** `src/pages/UsersPage/UsersPage.tsx`
+
+**Issue:**
+- Changing pages didn't update the URL
+- Filtering by status didn't update the URL
+- Refreshing the page reset pagination to page 1
+
+**Root Cause:** The component read URL params but didn't update them when state changed. State changes weren't reflected in the URL, so refreshing lost the current page/filter state.
+
+**Solution:** Implemented bidirectional URL synchronization:
+1. **Initialize from URL**: State is now initialized from URL search params on component mount
+2. **Update URL on state change**: Added a useEffect that updates URL whenever pagination, status filter, or search query changes
+3. **Use setSearchParams**: Properly update the URL search parameters using React Router's `setSearchParams`
+
+**Changes:**
+- Added `useNavigate` import from React Router
+- Initialize state from URL params: `searchParams.get('page')`, `searchParams.get('status')`, `searchParams.get('search')`
+- Added useEffect to sync state changes back to URL
+- Removed confusing manual URL parsing logic
+
+**URL Format:** `/users?page=2&pageSize=10&status=active&search=john`
+
+**Impact:** Users can now:
+- Share URLs that preserve page state
+- Use browser back/forward to navigate between previously visited pages
+- Refresh without losing current pagination and filter state

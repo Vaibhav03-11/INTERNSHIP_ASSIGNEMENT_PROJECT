@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -33,11 +33,6 @@ import type { User, ColumnMetadata } from '@/types';
  * BUG #2: The 'Groups' column shows "[object Object]" instead of group names.
  *         (Located in DynamicGrid component - chiplist renderer issue)
  *
- * BUG #3: Page/filter state is not synced with URL params.
- *         When you change page or filter, URL doesn't update.
- *         When you refresh, pagination resets to page 1.
- *         (Located in this file - URL sync issue)
- *
  * INCOMPLETE FEATURES:
  *
  * 1. Search is not debounced - API is called on every keystroke.
@@ -45,31 +40,35 @@ import type { User, ColumnMetadata } from '@/types';
  * 3. No error boundary or proper error UI.
  */
 export const UsersPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Local state for filters
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  // Initialize state from URL params
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get('search') || ''
+  );
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>(
+    (searchParams.get('status') as 'all' | 'active' | 'inactive') || 'all'
+  );
   const [pagination, setPagination] = useState<MRT_PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
+    pageIndex: Math.max(0, (parseInt(searchParams.get('page') || '1') - 1)),
+    pageSize: parseInt(searchParams.get('pageSize') || '10'),
   });
 
-  // BUG #3: URL params are read but not used properly
-  // This effect runs AFTER initial render, causing the pagination to reset
+  // Update URL when pagination changes
   useEffect(() => {
-    const page = searchParams.get('page');
-    const status = searchParams.get('status');
-
-    if (page) {
-      // BUG: This runs after initial data fetch, causing a flicker
-      setPagination((prev) => ({ ...prev, pageIndex: parseInt(page) - 1 }));
+    const newParams = new URLSearchParams();
+    newParams.set('page', (pagination.pageIndex + 1).toString());
+    newParams.set('pageSize', pagination.pageSize.toString());
+    if (statusFilter !== 'all') {
+      newParams.set('status', statusFilter);
     }
-    if (status) {
-      setStatusFilter(status as 'all' | 'active' | 'inactive');
+    if (searchQuery) {
+      newParams.set('search', searchQuery);
     }
-  }, [searchParams]);
+    setSearchParams(newParams);
+  }, [pagination, statusFilter, searchQuery, setSearchParams]);
 
   // Fetch users - BUG: Search is not debounced!
   // TODO: Use the useDebounce hook to debounce the search query
@@ -102,7 +101,6 @@ export const UsersPage: React.FC = () => {
   // Handle search input change - BUG: Not debounced!
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    // TODO: Implement debouncing to prevent API calls on every keystroke
     // Reset to first page when searching
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
   };
@@ -111,14 +109,11 @@ export const UsersPage: React.FC = () => {
   const handleStatusFilterChange = (value: 'all' | 'active' | 'inactive') => {
     setStatusFilter(value);
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-    // BUG: URL is not updated when filter changes
   };
 
   // Handle pagination change
   const handlePaginationChange = (newPagination: MRT_PaginationState) => {
     setPagination(newPagination);
-    // BUG: URL is not updated when pagination changes
-    // TODO: Update URL search params when pagination changes
   };
 
   // Add actions column to metadata
