@@ -1,1 +1,1 @@
-export { DynamicGrid, UserActions } from './tables';
+export { DynamicGrid, UserActions, TableSkeleton } from './tables';

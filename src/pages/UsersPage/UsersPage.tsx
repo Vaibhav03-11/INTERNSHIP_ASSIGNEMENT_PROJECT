@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useSnackbar } from 'notistack';
-import { DynamicGrid, UserActions } from '@/components';
+import { DynamicGrid, UserActions, TableSkeleton } from '@/components';
 import { useUsers, useUpdateUserStatus, useDebounce } from '@/hooks';
 import { userColumnMetadata } from '@/utils';
 import type { MRT_PaginationState } from 'material-react-table';
@@ -35,12 +35,10 @@ import type { User, ColumnMetadata } from '@/types';
  *
  * INCOMPLETE FEATURES:
  *
- * 1. No loading skeleton - just shows spinner.
- * 2. No error boundary or proper error UI.
+ * 1. No error boundary or proper error UI.
  */
 export const UsersPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   // Initialize state from URL params
@@ -202,14 +200,18 @@ export const UsersPage: React.FC = () => {
 
       {/* Users Table */}
       <Paper>
-        <DynamicGrid
-          data={usersWithActions}
-          columns={columnsWithActions}
-          isLoading={isLoading}
-          totalCount={data?.data?.totalCount || 0}
-          pagination={pagination}
-          onPaginationChange={handlePaginationChange}
-        />
+        {isLoading ? (
+          <TableSkeleton columns={columnsWithActions} rowCount={pagination.pageSize} />
+        ) : (
+          <DynamicGrid
+            data={usersWithActions}
+            columns={columnsWithActions}
+            isLoading={isLoading}
+            totalCount={data?.data?.totalCount || 0}
+            pagination={pagination}
+            onPaginationChange={handlePaginationChange}
+          />
+        )}
       </Paper>
     </Box>
   );

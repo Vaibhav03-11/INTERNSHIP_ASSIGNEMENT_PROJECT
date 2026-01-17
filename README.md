@@ -169,3 +169,37 @@ See **ASSIGNMENT.md** for detailed instructions.
 - Reduced API calls by ~90% during typing
 - Improved performance and reduced server load
 - Better user experience with no lag in input while preventing unnecessary requests
+
+---
+
+#### Feature #2: Loading Skeleton
+**Location:** `src/components/tables/TableSkeleton.tsx`, `src/pages/UsersPage/UsersPage.tsx`
+
+**Previous State:** Table displayed a generic loading spinner when fetching data, providing no visual indication of the table structure.
+
+**Implementation:**
+- Created a new `TableSkeleton` component using MUI Skeleton component
+- Skeleton displays placeholder rows that match the actual table structure
+- Different skeleton types for different column types:
+  - **String columns**: Text skeleton
+  - **Badge columns**: Rounded skeleton (70px width)
+  - **Chiplist columns**: Multiple chip skeletons
+  - **Date columns**: Text skeleton (100px width)
+
+**How It Works:**
+1. When `isLoading` is true, show `TableSkeleton` instead of `DynamicGrid`
+2. Skeleton renders the same number of rows as the current page size
+3. Each cell shows a skeleton that matches its column type
+4. When data loads, skeleton is replaced with actual data
+
+**Changes:**
+- Created `src/components/tables/TableSkeleton.tsx` component
+- Updated `src/components/tables/index.ts` to export TableSkeleton
+- Modified `UsersPage.tsx` to conditionally render TableSkeleton when loading
+- Skeleton receives columns metadata and rowCount (based on pagination.pageSize)
+
+**Impact:**
+- Better perceived performance with visual feedback
+- Users can see the table structure while data loads
+- More professional and polished loading experience
+- Matches Material Design loading patterns
