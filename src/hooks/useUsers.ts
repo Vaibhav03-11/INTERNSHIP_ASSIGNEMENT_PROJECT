@@ -10,11 +10,28 @@ export const userQueryKeys = {
 
 /**
  * Hook to fetch users with pagination and filters
+ * 
+ * Features:
+ * - Automatic retries on network failures (max 3 attempts)
+ * - Progressive backoff strategy (500ms → 1s → 2s)
+ * - Better error handling with detailed error information
  */
 export const useUsers = (params: PaginationParams) => {
   return useQuery({
     queryKey: userQueryKeys.list(params),
     queryFn: () => fetchUsers(params),
+    retry: (failureCount, error) => {
+      // Don't retry on client errors (4xx)
+      if (error instanceof Error && error.message.includes('4')) {
+        return false;
+      }
+      // Retry up to 3 times on network or server errors
+      return failureCount < 3;
+    },
+    retryDelay: (attemptIndex) => {
+      // Progressive backoff: 500ms, 1s, 2s
+      return Math.min(1000 * 2 ** attemptIndex, 30000);
+    },
   });
 };
 

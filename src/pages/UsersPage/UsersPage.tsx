@@ -9,10 +9,12 @@ import {
   Select,
   MenuItem,
   Paper,
-  Alert,
   InputAdornment,
+  Button,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import WarningIcon from '@mui/icons-material/Warning';
 import { useSnackbar } from 'notistack';
 import { DynamicGrid, UserActions, TableSkeleton } from '@/components';
 import { useUsers, useUpdateUserStatus, useDebounce } from '@/hooks';
@@ -71,7 +73,7 @@ export const UsersPage: React.FC = () => {
   }, [pagination, statusFilter, debouncedSearchQuery, setSearchParams]);
 
   // Fetch users with debounced search query
-  const { data, isLoading, error } = useUsers({
+  const { data, isLoading, error, refetch } = useUsers({
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
     query: debouncedSearchQuery,
@@ -85,6 +87,29 @@ export const UsersPage: React.FC = () => {
     query: debouncedSearchQuery,
     status: statusFilter,
   });
+
+  /**
+   * Get user-friendly error message from error object
+   */
+  const getErrorMessage = (): string => {
+    if (!error) return 'Unknown error occurred';
+    
+    if (error instanceof Error) {
+      if (error.message.includes('Network')) {
+        return 'Network connection failed. Please check your internet connection and try again.';
+      }
+      if (error.message.includes('timeout')) {
+        return 'Request timed out. The server is taking too long to respond.';
+      }
+      return error.message;
+    }
+    
+    return 'Failed to load users. Please try again.';
+  };
+
+  const handleRetry = () => {
+    refetch();
+  };
 
   // Handle status toggle
   const handleToggleStatus = (userId: string, newStatus: 'active' | 'inactive') => {
@@ -143,12 +168,64 @@ export const UsersPage: React.FC = () => {
     ),
   }));
 
-  // Error state - TODO: Improve error UI
+  // Error state with retry button
   if (error) {
     return (
-      <Alert severity="error" sx={{ mt: 2 }}>
-        Failed to load users: {error.message}
-      </Alert>
+      <Box>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Users
+        </Typography>
+
+        <Paper
+          sx={{
+            p: 3,
+            backgroundColor: 'error.50',
+            borderLeft: '4px solid',
+            borderColor: 'error.main',
+            borderRadius: 2,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+            <WarningIcon sx={{ color: 'error.main', mt: 0.5, flexShrink: 0 }} />
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" color="error.main" sx={{ fontWeight: 600, mb: 1 }}>
+                Failed to Load Users
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {getErrorMessage()}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                {import.meta.env.DEV && error instanceof Error
+                  ? `Technical details: ${error.message}`
+                  : ''}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<RefreshIcon />}
+                  onClick={handleRetry}
+                  sx={{ px: 3 }}
+                >
+                  Try Again
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setStatusFilter('all');
+                    setPagination({ pageIndex: 0, pageSize: 10 });
+                  }}
+                  sx={{ px: 3 }}
+                >
+                  Reset Filters
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Paper>
+      </Box>
     );
   }
 
