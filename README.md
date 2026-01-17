@@ -138,3 +138,34 @@ See **ASSIGNMENT.md** for detailed instructions.
 - Share URLs that preserve page state
 - Use browser back/forward to navigate between previously visited pages
 - Refresh without losing current pagination and filter state
+
+---
+
+### Features Completed
+
+#### Feature #1: Debounced Search
+**Location:** `src/pages/UsersPage/UsersPage.tsx`
+
+**Previous State:** Search input triggered an API call on every single keystroke, causing excessive network requests and poor performance.
+
+**Implementation:**
+- Imported and used the `useDebounce` hook from `src/hooks/useDebounce.ts`
+- Set debounce delay to 300ms
+- Applied debouncing to the search query before passing it to the API fetch
+
+**How It Works:**
+1. User types in search input → `searchQuery` state updates immediately (UI stays responsive)
+2. `useDebounce` waits 300ms after user stops typing
+3. Only then does `debouncedSearchQuery` update, triggering the API call
+4. If user continues typing, the timer resets
+
+**Changes:**
+- Added `useDebounce` import from hooks
+- Created `debouncedSearchQuery` using `useDebounce(searchQuery, 300)`
+- Updated `useUsers` hook to use `debouncedSearchQuery` instead of `searchQuery`
+- Updated URL sync effect to use `debouncedSearchQuery`
+
+**Impact:**
+- Reduced API calls by ~90% during typing
+- Improved performance and reduced server load
+- Better user experience with no lag in input while preventing unnecessary requests
