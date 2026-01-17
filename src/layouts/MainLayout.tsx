@@ -17,13 +17,13 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 export const MainLayout: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" elevation={1}>
-        <Toolbar>
-          <AdminPanelSettingsIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+      <AppBar position="static" elevation={2} sx={{ background: 'linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)' }}>
+        <Toolbar sx={{ py: 0.5 }}>
+          <AdminPanelSettingsIcon sx={{ mr: 2, fontSize: 32 }} />
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 700, letterSpacing: 0.5 }}>
             Admin Dashboard
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.8 }}>
+          <Typography variant="body1" sx={{ fontWeight: 600, letterSpacing: 0.3 }}>
             Internship Assignment
           </Typography>
         </Toolbar>
