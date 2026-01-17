@@ -73,16 +73,19 @@ See **ASSIGNMENT.md** for detailed instructions.
 
 ## Changes Made
 
-<!--
-CANDIDATE: Document your changes here after completing the assignment.
-
 ### Bug Fixes
-1. **Cache Invalidation** - ...
-2. **Chiplist Renderer** - ...
-3. **URL Sync** - ...
 
-### Features Completed
-1. **Debounced Search** - ...
-2. **Loading Skeleton** - ...
-3. **Optimistic UI** - ...
--->
+#### Bug #1: Table Doesn't Refresh After Status Update 
+**Location:** `src/hooks/useUsers.ts`
+
+**Issue:** When clicking activate/deactivate on a user, the snackbar showed success but the table didn't update. Users had to manually refresh the page to see the status change.
+
+**Root Cause:** The `useUpdateUserStatus` hook was missing React Query cache invalidation in the `onSuccess` callback. After the mutation completed, React Query didn't know the cached user data was stale.
+
+**Solution:** Added `queryClient.invalidateQueries({ queryKey: userQueryKeys.all })` to the `onSuccess` callback. This tells React Query to mark all user queries as stale and refetch the data automatically.
+
+**Changes:**
+- Modified `useUpdateUserStatus` hook to invalidate the users query cache on successful mutation
+- Table now automatically refreshes with the updated user status without requiring a page reload
+
+**Impact:** Improved user experience with immediate visual feedback when toggling user status.
