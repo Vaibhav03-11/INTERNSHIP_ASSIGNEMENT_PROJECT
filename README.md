@@ -294,3 +294,75 @@ Uses React Query's mutation callbacks to implement optimistic UI:
 - Improved accessibility with sticky headers and better contrast
 - More intuitive empty/error states help users understand application state
 - Consistent, cohesive design language across all components
+
+---
+
+#### Feature #4: Comprehensive Error Handling
+**Location:** `src/components/ErrorBoundary.tsx`, `src/api/userApi.ts`, `src/hooks/useUsers.ts`, `src/pages/UsersPage/UsersPage.tsx`, `src/App.tsx`
+
+**Previous State:** Basic error alert when API fails. No handling for unexpected React errors. No retry mechanism for failed requests.
+
+**Implementation:**
+
+**Error Boundary Component:**
+- Created global `ErrorBoundary` component using React Error Boundary pattern
+- Catches render errors, lifecycle errors, and constructor errors anywhere in component tree
+- Displays user-friendly fallback UI instead of crashing the entire app
+- Shows detailed error stack trace in development mode only
+- Provides "Try Again" reset button and "Go Home" navigation
+- Tracks error occurrence count for debugging
+
+**Enhanced API Error Handling:**
+- Created custom `ApiError` class with status code, status text, error message, and optional details
+- Handles network errors (connection failures) with meaningful messages
+- Adds 30-second timeout to all API requests
+- Gracefully handles JSON parsing errors
+- Provides context-specific error messages for different failure scenarios
+
+**Automatic Retry Logic:**
+- `useUsers` hook now retries failed requests up to 3 times
+- Progressive backoff strategy: 500ms → 1s → 2s delays between retries
+- Smart retry logic: skips retries for client errors (4xx), only retries network/server errors (5xx)
+- Reduces impact of temporary network issues
+
+**Improved Error UI in UsersPage:**
+- Replaced basic `Alert` with comprehensive error panel
+- Shows user-friendly error messages based on error type:
+  - Network errors: "Check your internet connection"
+  - Timeout errors: "Server is taking too long to respond"
+  - Generic errors: Contextual message
+- "Try Again" button to manually retry failed requests
+- "Reset Filters" button to recover from error state
+- Technical details shown in development mode only
+
+**Global Error Protection:**
+- Wrapped entire app with `ErrorBoundary` in `App.tsx`
+- Prevents catastrophic failures from breaking the app
+- User can always recover or navigate home
+
+**Changes:**
+- Created `src/components/ErrorBoundary.tsx` with full error boundary implementation
+- Exported `ErrorBoundary` from `src/components/index.ts`
+- Enhanced `src/api/userApi.ts`:
+  - Added `ApiError` class
+  - Added `handleApiError` helper function
+  - Added 30s timeout to all fetch requests
+  - Improved error messages and error type detection
+- Updated `src/hooks/useUsers.ts`:
+  - Added `retry` configuration (max 3 attempts)
+  - Added `retryDelay` with progressive backoff
+- Enhanced `src/pages/UsersPage/UsersPage.tsx`:
+  - Added `refetch` from `useUsers` hook
+  - Added `getErrorMessage` helper for user-friendly messages
+  - Added `handleRetry` function
+  - Replaced basic error alert with comprehensive error panel
+  - Added "Try Again" and "Reset Filters" buttons
+- Wrapped app with `ErrorBoundary` in `src/App.tsx`
+
+**Impact:**
+- Significantly improved error resilience and user experience
+- Users can recover from errors without refreshing the page
+- Automatic retries reduce frustration from temporary network issues
+- Development-friendly error details speed up debugging
+- Professional error handling aligned with production standards
+- App remains stable even when unexpected errors occur
