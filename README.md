@@ -75,7 +75,7 @@ See **ASSIGNMENT.md** for detailed instructions.
 
 ### Bug Fixes
 
-#### Bug #1: Table Doesn't Refresh After Status Update 
+#### Bug #1: Table Doesn't Refresh After Status Update ✅
 **Location:** `src/hooks/useUsers.ts`
 
 **Issue:** When clicking activate/deactivate on a user, the snackbar showed success but the table didn't update. Users had to manually refresh the page to see the status change.
@@ -89,3 +89,22 @@ See **ASSIGNMENT.md** for detailed instructions.
 - Table now automatically refreshes with the updated user status without requiring a page reload
 
 **Impact:** Improved user experience with immediate visual feedback when toggling user status.
+
+---
+
+#### Bug #2: Groups Column Shows "[object Object]" ✅
+**Location:** `src/components/tables/DynamicGrid.tsx`
+
+**Issue:** The "Groups" column displayed `[object Object]` instead of showing group names as chips.
+
+**Root Cause:** In the `renderCellByType` function's `chiplist` case, the code was using `group.toString()` for both the key and label, which converts the Group object to the string `"[object Object]"`.
+
+**Solution:** Updated the chip renderer to access the correct properties from the Group object:
+- Changed `key={group.toString()}` to `key={group.groupId}`
+- Changed `label={group.toString()}` to `label={group.groupName}`
+
+**Changes:**
+- Fixed chiplist renderer to properly extract `groupId` and `groupName` from Group objects
+- Groups now display as readable, properly formatted chips with their actual names
+
+**Impact:** Users can now see which groups each user belongs to, improving data visibility and usability.
