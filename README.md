@@ -75,7 +75,7 @@ See **ASSIGNMENT.md** for detailed instructions.
 
 ### Bug Fixes
 
-#### Bug #1: Table Doesn't Refresh After Status Update ✅
+#### Bug #1: Table Doesn't Refresh After Status Update
 **Location:** `src/hooks/useUsers.ts`
 
 **Issue:** When clicking activate/deactivate on a user, the snackbar showed success but the table didn't update. Users had to manually refresh the page to see the status change.
@@ -92,7 +92,7 @@ See **ASSIGNMENT.md** for detailed instructions.
 
 ---
 
-#### Bug #2: Groups Column Shows "[object Object]" ✅
+#### Bug #2: Groups Column Shows "[object Object]"
 **Location:** `src/components/tables/DynamicGrid.tsx`
 
 **Issue:** The "Groups" column displayed `[object Object]` instead of showing group names as chips.
@@ -111,7 +111,7 @@ See **ASSIGNMENT.md** for detailed instructions.
 
 ---
 
-#### Bug #3: Pagination Not Synced with URL ✅
+#### Bug #3: Pagination Not Synced with URL
 **Location:** `src/pages/UsersPage/UsersPage.tsx`
 
 **Issue:**
