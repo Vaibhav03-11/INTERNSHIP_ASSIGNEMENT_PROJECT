@@ -15,27 +15,42 @@ const queryClient = new QueryClient({
   },
 });
 
-// Create MUI theme
+// Create MUI theme (palette, typography, and component polish)
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-    background: {
-      default: '#f5f5f5',
-    },
+    primary: { main: '#1565c0' },
+    secondary: { main: '#7b1fa2' },
+    background: { default: '#f7f9fc', paper: '#ffffff' },
+  },
+  shape: { borderRadius: 10 },
+  spacing: 8,
+  typography: {
+    fontFamily: ['Inter', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(', '),
+    h4: { fontWeight: 700, letterSpacing: 0.25 },
+    body2: { color: '#5f6b7a' },
   },
   components: {
     MuiButton: {
+      styleOverrides: { root: { textTransform: 'none', borderRadius: 8 } },
+    },
+    MuiPaper: {
+      styleOverrides: { root: { borderRadius: 12 } },
+      defaultProps: { elevation: 1 },
+    },
+    MuiChip: {
+      defaultProps: { size: 'small' },
+      styleOverrides: { root: { borderRadius: 6 } },
+    },
+    MuiTableCell: {
       styleOverrides: {
-        root: {
-          textTransform: 'none',
+        head: {
+          backgroundColor: '#f0f3f7',
+          fontWeight: 600,
+          borderBottom: '1px solid #e5eaf2',
         },
       },
     },
+    MuiIconButton: { defaultProps: { size: 'small' } },
   },
 });
 

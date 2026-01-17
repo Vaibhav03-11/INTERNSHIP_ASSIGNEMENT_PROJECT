@@ -36,7 +36,8 @@ const renderCellByType = (
         <Chip
           label={status}
           size="small"
-          color={status === 'active' ? 'success' : 'default'}
+          color={status === 'active' ? 'success' : 'warning'}
+          variant={status === 'active' ? 'filled' : 'outlined'}
           sx={{ textTransform: 'capitalize' }}
         />
       );
@@ -51,13 +52,15 @@ const renderCellByType = (
       }
 
       return (
-        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
           {groups.map((group) => (
             <Chip
               key={group.groupId}
               label={group.groupName}
               size="small"
+              color="primary"
               variant="outlined"
+              sx={{ borderRadius: 1 }}
             />
           ))}
         </Box>
@@ -111,6 +114,7 @@ export const DynamicGrid: React.FC<DynamicGridProps> = ({
     enableGlobalFilter: false,
     manualPagination: true,
     rowCount: totalCount,
+    enableStickyHeader: true,
     state: {
       isLoading,
       pagination,
@@ -121,11 +125,22 @@ export const DynamicGrid: React.FC<DynamicGridProps> = ({
       onPaginationChange(newPagination);
     },
     muiTableContainerProps: {
-      sx: { maxHeight: '600px' },
+      sx: { maxHeight: '600px', borderTop: '1px solid', borderColor: 'divider' },
     },
-    muiTableBodyRowProps: ({ row }) => ({
+    muiTableHeadCellProps: {
+      sx: {
+        fontWeight: 600,
+        backgroundColor: 'grey.100',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+      },
+    },
+    muiTableBodyRowProps: () => ({
       sx: {
         cursor: 'pointer',
+        '&:nth-of-type(odd)': {
+          backgroundColor: 'rgba(0,0,0,0.02)',
+        },
         '&:hover': {
           backgroundColor: 'action.hover',
         },

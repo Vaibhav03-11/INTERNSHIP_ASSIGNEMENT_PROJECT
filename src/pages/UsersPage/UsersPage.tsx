@@ -207,6 +207,11 @@ export const UsersPage: React.FC = () => {
       <Paper>
         {isLoading ? (
           <TableSkeleton columns={columnsWithActions} rowCount={pagination.pageSize} />
+        ) : usersWithActions.length === 0 ? (
+          <Box sx={{ p: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 1 }}>
+            <Typography variant="h6" color="text.secondary">No users found</Typography>
+            <Typography variant="body2" color="text.secondary">Try adjusting your filters or search query.</Typography>
+          </Box>
         ) : (
           <DynamicGrid
             data={usersWithActions}
