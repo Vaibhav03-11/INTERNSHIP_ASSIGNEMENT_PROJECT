@@ -16,6 +16,11 @@ npm run dev
 ```
 
 The app will be available at http://localhost:5173
+# live demo
+https://internship-assignement-project.vercel.app/
+
+# git hub repo
+https://github.com/Vaibhav03-11/INTERNSHIP_ASSIGNEMENT_PROJECT.git
 
 ## Tech Stack
 
@@ -88,7 +93,6 @@ See **ASSIGNMENT.md** for detailed instructions.
 - Modified `useUpdateUserStatus` hook to invalidate the users query cache on successful mutation
 - Table now automatically refreshes with the updated user status without requiring a page reload
 
-**Impact:** Improved user experience with immediate visual feedback when toggling user status.
 
 ---
 
@@ -107,7 +111,6 @@ See **ASSIGNMENT.md** for detailed instructions.
 - Fixed chiplist renderer to properly extract `groupId` and `groupName` from Group objects
 - Groups now display as readable, properly formatted chips with their actual names
 
-**Impact:** Users can now see which groups each user belongs to, improving data visibility and usability.
 
 ---
 
@@ -134,10 +137,6 @@ See **ASSIGNMENT.md** for detailed instructions.
 
 **URL Format:** `/users?page=2&pageSize=10&status=active&search=john`
 
-**Impact:** Users can now:
-- Share URLs that preserve page state
-- Use browser back/forward to navigate between previously visited pages
-- Refresh without losing current pagination and filter state
 
 ---
 
@@ -367,3 +366,8 @@ Uses React Query's mutation callbacks to implement optimistic UI:
 - Development-friendly error details speed up debugging
 - Professional error handling aligned with production standards
 - App remains stable even when unexpected errors occur
+
+
+
+
+
