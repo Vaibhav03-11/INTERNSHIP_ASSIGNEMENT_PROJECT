@@ -83,6 +83,8 @@ export const getUsers = (params: {
   pageSize?: number;
   query?: string;
   status?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }): { users: User[]; totalCount: number } => {
   let filtered = [...mockUsers];
 
@@ -99,6 +101,34 @@ export const getUsers = (params: {
   // Filter by status
   if (params.status && params.status !== 'all') {
     filtered = filtered.filter((user) => user.status === params.status);
+  }
+
+  // Sorting
+  if (params.sortBy) {
+    const desc = params.sortOrder === 'desc';
+    filtered.sort((a, b) => {
+      const valA = (a as any)[params.sortBy!]; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const valB = (b as any)[params.sortBy!]; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      // Handle date sorting
+      if (params.sortBy === 'createdAt') {
+        const timeA = new Date(valA).getTime();
+        const timeB = new Date(valB).getTime();
+        return desc ? timeB - timeA : timeA - timeB;
+      }
+
+      // String sorting default
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return desc ? valB.localeCompare(valA) : valA.localeCompare(valB);
+      }
+
+      // Fallback numeric comparison
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return desc ? valB - valA : valA - valB;
+      }
+
+      return 0;
+    });
   }
 
   const totalCount = filtered.length;

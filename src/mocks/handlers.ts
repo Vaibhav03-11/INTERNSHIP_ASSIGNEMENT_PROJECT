@@ -12,8 +12,9 @@ export const handlers = [
     const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
     const query = url.searchParams.get('query') || '';
     const status = url.searchParams.get('status') || 'all';
-
-    const result = getUsers({ page, pageSize, query, status });
+    const sortBy = url.searchParams.get('sortBy') || undefined;
+    const sortOrder = (url.searchParams.get('sortOrder') as 'asc' | 'desc' | null) || undefined;
+    const result = getUsers({ page, pageSize, query, status, sortBy, sortOrder });
 
     return HttpResponse.json({
       data: {

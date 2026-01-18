@@ -58,6 +58,13 @@ export const fetchUsers = async (
       searchParams.set('status', params.status);
     }
 
+    if (params.sortBy) {
+      searchParams.set('sortBy', params.sortBy);
+      if (params.sortOrder) {
+        searchParams.set('sortOrder', params.sortOrder);
+      }
+    }
+
     const response = await fetch(`${API_BASE}/users?${searchParams}`, {
       signal: AbortSignal.timeout(30000), // 30s timeout
     });

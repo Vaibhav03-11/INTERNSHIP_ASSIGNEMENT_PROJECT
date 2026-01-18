@@ -4,6 +4,8 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
   type MRT_PaginationState,
+  type MRT_SortingState,
+  type MRT_VisibilityState,
 } from 'material-react-table';
 import { Chip, Box } from '@mui/material';
 import type { ColumnMetadata, User, Group } from '@/types';
@@ -17,6 +19,10 @@ interface DynamicGridProps {
   pagination: MRT_PaginationState;
   onPaginationChange: (pagination: MRT_PaginationState) => void;
   onRowAction?: (user: User, action: string) => void;
+  sorting?: MRT_SortingState;
+  onSortingChange?: (sorting: MRT_SortingState) => void;
+  columnVisibility?: MRT_VisibilityState;
+  onColumnVisibilityChange?: (visibility: MRT_VisibilityState) => void;
 }
 
 /**
@@ -81,7 +87,8 @@ const renderCellByType = (
  * - Dynamic column generation from metadata
  * - Custom cell renderers for different data types
  * - Server-side pagination
- * - Sorting support
+ * - Sorting support with state persistence
+ * - Column visibility management with localStorage persistence
  */
 export const DynamicGrid: React.FC<DynamicGridProps> = ({
   data,
@@ -90,6 +97,10 @@ export const DynamicGrid: React.FC<DynamicGridProps> = ({
   totalCount,
   pagination,
   onPaginationChange,
+  sorting = [],
+  onSortingChange,
+  columnVisibility = {},
+  onColumnVisibilityChange,
 }) => {
   // Generate MRT columns from metadata
   const tableColumns = useMemo<MRT_ColumnDef<User>[]>(() => {
@@ -112,17 +123,35 @@ export const DynamicGrid: React.FC<DynamicGridProps> = ({
     enableRowSelection: false,
     enableColumnFilters: false,
     enableGlobalFilter: false,
+    enableHiding: true,
     manualPagination: true,
+    manualSorting: true,
     rowCount: totalCount,
     enableStickyHeader: true,
     state: {
       isLoading,
       pagination,
+      sorting,
+      columnVisibility,
     },
     onPaginationChange: (updater) => {
       const newPagination =
         typeof updater === 'function' ? updater(pagination) : updater;
       onPaginationChange(newPagination);
+    },
+    onSortingChange: (updater) => {
+      if (onSortingChange) {
+        const newSorting =
+          typeof updater === 'function' ? updater(sorting) : updater;
+        onSortingChange(newSorting);
+      }
+    },
+    onColumnVisibilityChange: (updater) => {
+      if (onColumnVisibilityChange) {
+        const newVisibility =
+          typeof updater === 'function' ? updater(columnVisibility) : updater;
+        onColumnVisibilityChange(newVisibility);
+      }
     },
     muiTableContainerProps: {
       sx: { maxHeight: '600px', borderTop: '1px solid', borderColor: 'divider' },

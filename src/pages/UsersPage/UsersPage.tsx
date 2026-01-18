@@ -17,9 +17,9 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import WarningIcon from '@mui/icons-material/Warning';
 import { useSnackbar } from 'notistack';
 import { DynamicGrid, UserActions, TableSkeleton } from '@/components';
-import { useUsers, useUpdateUserStatus, useDebounce } from '@/hooks';
+import { useUsers, useUpdateUserStatus, useDebounce, usePersistentState } from '@/hooks';
 import { userColumnMetadata } from '@/utils';
-import type { MRT_PaginationState } from 'material-react-table';
+import type { MRT_PaginationState, MRT_SortingState, MRT_VisibilityState } from 'material-react-table';
 import type { User, ColumnMetadata } from '@/types';
 
 /**
@@ -55,10 +55,26 @@ export const UsersPage: React.FC = () => {
     pageSize: parseInt(searchParams.get('pageSize') || '10'),
   });
 
+  // Sorting state from URL params
+  const [sorting, setSorting] = useState<MRT_SortingState>(() => {
+    const sortColumn = searchParams.get('sortBy');
+    const sortOrder = searchParams.get('sortOrder') as 'asc' | 'desc' | null;
+    if (sortColumn && sortOrder) {
+      return [{ id: sortColumn, desc: sortOrder === 'desc' }];
+    }
+    return [];
+  });
+
+  // Column visibility state persisted in localStorage
+  const [columnVisibility, setColumnVisibility] = usePersistentState<MRT_VisibilityState>(
+    'users-column-visibility',
+    {}
+  );
+
   // Debounce search query to prevent excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // Update URL when pagination changes
+  // Update URL when pagination, filters, or sorting changes
   useEffect(() => {
     const newParams = new URLSearchParams();
     newParams.set('page', (pagination.pageIndex + 1).toString());
@@ -69,15 +85,22 @@ export const UsersPage: React.FC = () => {
     if (debouncedSearchQuery) {
       newParams.set('search', debouncedSearchQuery);
     }
+    if (sorting.length > 0) {
+      newParams.set('sortBy', sorting[0].id);
+      newParams.set('sortOrder', sorting[0].desc ? 'desc' : 'asc');
+    }
     setSearchParams(newParams);
-  }, [pagination, statusFilter, debouncedSearchQuery, setSearchParams]);
+  }, [pagination, statusFilter, debouncedSearchQuery, sorting, setSearchParams]);
 
   // Fetch users with debounced search query
+  const primarySort = sorting[0];
   const { data, isLoading, error, refetch } = useUsers({
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
     query: debouncedSearchQuery,
     status: statusFilter,
+    sortBy: primarySort?.id,
+    sortOrder: primarySort ? (primarySort.desc ? 'desc' : 'asc') : undefined,
   });
 
   // Update user status mutation with optimistic UI for the current page dataset
@@ -86,6 +109,8 @@ export const UsersPage: React.FC = () => {
     pageSize: pagination.pageSize,
     query: debouncedSearchQuery,
     status: statusFilter,
+    sortBy: primarySort?.id,
+    sortOrder: primarySort ? (primarySort.desc ? 'desc' : 'asc') : undefined,
   });
 
   /**
@@ -143,6 +168,16 @@ export const UsersPage: React.FC = () => {
   // Handle pagination change
   const handlePaginationChange = (newPagination: MRT_PaginationState) => {
     setPagination(newPagination);
+  };
+
+  // Handle sorting change
+  const handleSortingChange = (newSorting: MRT_SortingState) => {
+    setSorting(newSorting);
+  };
+
+  // Handle column visibility change
+  const handleColumnVisibilityChange = (newVisibility: MRT_VisibilityState) => {
+    setColumnVisibility(newVisibility);
   };
 
   // Add actions column to metadata
@@ -297,6 +332,10 @@ export const UsersPage: React.FC = () => {
             totalCount={data?.data?.totalCount || 0}
             pagination={pagination}
             onPaginationChange={handlePaginationChange}
+            sorting={sorting}
+            onSortingChange={handleSortingChange}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={handleColumnVisibilityChange}
           />
         )}
       </Paper>

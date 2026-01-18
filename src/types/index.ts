@@ -35,6 +35,8 @@ export interface PaginationParams {
   pageSize: number;
   query?: string;
   status?: 'active' | 'inactive' | 'all';
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 // Column metadata type for dynamic grid
