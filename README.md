@@ -245,6 +245,7 @@ Uses React Query's mutation callbacks to implement optimistic UI:
 
 ---
 
+### new feature 1 : Actions Column with Status Toggle 
 ### UI/UX Enhancements
 
 #### Styling & Theme Improvements
@@ -297,7 +298,7 @@ Uses React Query's mutation callbacks to implement optimistic UI:
 
 ---
 
-#### Feature #4: Comprehensive Error Handling
+#### new Feature 2: Comprehensive Error Handling
 **Location:** `src/components/ErrorBoundary.tsx`, `src/api/userApi.ts`, `src/hooks/useUsers.ts`, `src/pages/UsersPage/UsersPage.tsx`, `src/App.tsx`
 
 **Previous State:** Basic error alert when API fails. No handling for unexpected React errors. No retry mechanism for failed requests.
